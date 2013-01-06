@@ -27,7 +27,13 @@ class BaseLongPollingView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        handler = super(BaseLongPollingView, self).dispatch(request, *args, **kwargs)
+        if request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        self.request = request
+        self.args = args
+        self.kwargs = kwargs
         response = HttpResponse(self._iterator(handler))
         response['Cache-Control'] = 'no-cache'
         return response
@@ -42,7 +48,7 @@ class BaseLongPollingView(View):
         return self.iterator()
 
     def _iterator(self, handler):
-        self.spawn(handler)
+        self.spawn(handler, self.request)
         for chunk in self.stream:
             yield chunk
 
@@ -53,9 +59,6 @@ class BaseLongPollingView(View):
 
     def spawn(self, fn, *args, **kwargs):
         self.greenlets.append(gevent.spawn(fn, *args, **kwargs))
-
-    def close(self):
-        self.response_completed.set()
 
     def close_connection(self):
         self.response_completed.set()
