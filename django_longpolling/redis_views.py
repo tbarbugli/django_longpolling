@@ -16,8 +16,11 @@ redis_connection_pool = redis.ConnectionPool(
 class BaseRedisPubSubView(BaseLongPollingView):
     redis_channel = None
 
+    def get_redis_connection(self):
+        return redis.Redis(connection_pool=redis_connection_pool)
+
     def iterator(self):
-        connection = redis.Redis(connection_pool=redis_connection_pool)
+        connection = self.get_redis_connection()
         pubsub = connection.pubsub()
         pubsub.subscribe(self.get_redis_channel())
         for message in pubsub.listen():
