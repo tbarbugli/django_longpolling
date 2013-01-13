@@ -26,13 +26,10 @@ class BaseRedisPubSubView(BaseLongPollingView):
         for message in pubsub.listen():
             if message['type'] == 'message':
                 try:
-                    self.write(self.decode_message(message['data']))
+                    yield self.decode_message(message['data'])
                 except Exception, e:
                     logger.exception(e)
-                finally:
-                    break
-        pubsub.unsubscribe()
-        self.close_connection()
+            break
 
     def get_redis_channel(self):
         """

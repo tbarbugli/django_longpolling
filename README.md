@@ -13,9 +13,8 @@ eg.
     class CountTenView(BaseLongPollingView):
 
         def iterator(self):
-            sleep(10)
-            self.write('10!')
-            self.close_connection()
+            sleep(42)
+            yield '42!'
 
 and then in your url module:
 
