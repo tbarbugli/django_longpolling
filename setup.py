@@ -6,7 +6,7 @@ Long polling requests for for Django 1.3+ using gevent
 
 setup(
     name="django_longpolling",
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/tbarbugli/django_longpolling',
     license='BSD',
     platforms=['OS Independent'],

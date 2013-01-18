@@ -25,6 +25,7 @@ class BaseLongPollingView(View):
         self.request = request
         self.args = args
         self.kwargs = kwargs
+        self.timeout = self.kwargs.get('channel')
         response = HttpResponse(self._iterator(handler))
         response['Cache-Control'] = 'no-cache'
         return response
@@ -39,7 +40,7 @@ class BaseLongPollingView(View):
         return self.iterator()
 
     def _iterator(self, handler):
-        timeout = gevent.Timeout(10, TimeoutPolling)
+        timeout = gevent.Timeout(self.timeout, TimeoutPolling)
         timeout.start()
         try:
             for chunk in handler(self.request):
