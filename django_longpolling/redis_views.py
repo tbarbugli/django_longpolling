@@ -29,7 +29,7 @@ class BaseRedisPubSubView(BaseLongPollingView):
                     yield self.decode_message(message['data'])
                 except Exception, e:
                     logger.exception(e)
-            break
+                break
 
     def get_redis_channel(self):
         """
